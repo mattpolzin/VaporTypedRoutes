@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "VaporTypedRoutes",
     platforms: [
-        .macOS(.v10_14)
+        .macOS(.v10_15)
     ],
     products: [
         .library(
@@ -13,7 +13,7 @@ let package = Package(
             targets: ["VaporTypedRoutes"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-beta.3.24"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-rc.3"),
     ],
     targets: [
         .target(
