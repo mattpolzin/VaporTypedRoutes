@@ -74,7 +74,7 @@ extension RoutesBuilder {
 
         let responder = BasicResponder { request in
             if case .collect(let max) = body, request.body.data == nil {
-                return request.body.collect(max: max).flatMapThrowing { _ in
+                return request.body.collect(max: max?.value ?? request.application.routes.defaultMaxBodySize.value).flatMapThrowing { _ in
                     return try wrappingClosure(request)
                 }.encodeResponse(for: request)
             } else {
