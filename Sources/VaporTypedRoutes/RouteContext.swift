@@ -18,6 +18,11 @@ extension EmptyResponseBody: ResponseEncodable {
 
 public protocol AbstractRouteContext {
     static var requestBodyType: Any.Type { get }
+
+    /// The default Content-Type of the response for the given context
+    /// assuming no Content-Type is specified by the request headers.
+    static var defaultContentType: HTTPMediaType? { get }
+
     static var requestQueryParams: [AbstractQueryParam] { get }
 
     static var responseBodyTuples: [(statusCode: Int, contentType: HTTPMediaType?, responseBodyType: Any.Type)] { get }

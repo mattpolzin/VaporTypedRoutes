@@ -30,6 +30,9 @@ public final class TypedRequest<Context: RouteContext> {
     }
 
     public func decodeBody() throws -> Context.RequestBodyType {
+        if request.content.contentType == nil {
+            request.headers.contentType = Context.defaultContentType
+        }
         return try request.content.decode(Context.RequestBodyType.self)
     }
 }

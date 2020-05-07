@@ -17,10 +17,10 @@ final class VaporTypedRoutesTests: XCTestCase {
             XCTAssertEqual(res.body.string, "Hello")
         }
 
-        try app.testable().test(.GET, "/hello?failHard") { res in
+        try app.testable().test(.GET, "/hello?failHard=t") { res in
             XCTAssertEqual(res.status, .badRequest)
             XCTAssertEqual(res.headers.contentType, .plainText)
-            XCTAssertNil(res.body.string)
+            XCTAssertEqual(res.body.string, "")
         }
 
         try app.testable().test(.GET, "/hello?echo=10") { res in
@@ -33,6 +33,8 @@ final class VaporTypedRoutesTests: XCTestCase {
 
 struct TestShowRouteContext: RouteContext {
     typealias RequestBodyType = EmptyRequestBody
+
+    static var defaultContentType: HTTPMediaType? = .plainText
 
     static let shared = Self()
 
