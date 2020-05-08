@@ -28,6 +28,11 @@ public protocol AbstractRouteContext {
     static var responseBodyTuples: [(statusCode: Int, contentType: HTTPMediaType?, responseBodyType: Any.Type)] { get }
 }
 
+public protocol AbstractJSONRouteContext: AbstractRouteContext {}
+extension AbstractJSONRouteContext {
+    public static var defaultContentType: HTTPMediaType? { .json }
+}
+
 /// A RouteContext holds the context for a particular route/endpoint.
 ///
 /// You must specify the request body type (although it may be a typealias to
@@ -67,6 +72,10 @@ public protocol RouteContext: AbstractRouteContext {
 
     static var shared: Self { get }
 }
+
+/// A `RouteContext` with the `defaultContentType` of
+/// application/json.
+public protocol JSONRouteContext: RouteContext & AbstractJSONRouteContext {}
 
 extension RouteContext {
     public static var requestBodyType: Any.Type { return RequestBodyType.self }
