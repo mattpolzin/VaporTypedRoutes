@@ -11,7 +11,7 @@ extension RoutesBuilder {
 
     @discardableResult
     public func get<Context, Response>(
-        _ path: PathComponent...,
+        _ path: TypedPathComponent...,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
@@ -21,7 +21,7 @@ extension RoutesBuilder {
 
     @discardableResult
     public func post<Context, Response>(
-        _ path: PathComponent...,
+        _ path: TypedPathComponent...,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
@@ -31,7 +31,7 @@ extension RoutesBuilder {
 
     @discardableResult
     public func patch<Context, Response>(
-        _ path: PathComponent...,
+        _ path: TypedPathComponent...,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
@@ -41,7 +41,7 @@ extension RoutesBuilder {
 
     @discardableResult
     public func put<Context, Response>(
-        _ path: PathComponent...,
+        _ path: TypedPathComponent...,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
@@ -51,7 +51,7 @@ extension RoutesBuilder {
 
     @discardableResult
     public func delete<Context, Response>(
-        _ path: PathComponent...,
+        _ path: TypedPathComponent...,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
@@ -62,7 +62,7 @@ extension RoutesBuilder {
     @discardableResult
     public func on<Context, Response>(
         _ method: HTTPMethod,
-        _ path: [PathComponent],
+        _ path: [TypedPathComponent],
         body: HTTPBodyStreamStrategy = .collect,
         use closure: @escaping (TypedRequest<Context>) throws -> Response
     ) -> Route
@@ -85,11 +85,17 @@ extension RoutesBuilder {
 
         let route = Route(
             method: method,
-            path: path,
+            path: path.map(\.vaporPathComponent),
             responder: responder,
             requestType: Context.RequestBodyType.self,
             responseType: Context.self
         )
+
+        for pathComponent in path {
+            if case let .parameter(name, meta) = pathComponent {
+                route.userInfo["typed_parameter:\(name)"] = meta
+            }
+        }
 
         self.add(route)
 
