@@ -44,3 +44,9 @@ public struct ResponseBuilder<Context: RouteContext> {
         }
     }
 }
+
+public extension ResponseBuilder.ResponseEncoder where ResponseBodyType == EmptyResponseBody {
+    func encodeEmptyResponse() -> EventLoopFuture<Response> {
+        return encode(EmptyResponseBody())
+    }
+}

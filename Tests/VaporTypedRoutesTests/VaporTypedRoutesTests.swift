@@ -11,23 +11,23 @@ final class VaporTypedRoutesTests: XCTestCase {
 
         app.routes.get("hello", use: TestController.showRoute)
 
-        try app.testable().test(.GET, "/hello") { res in
+        try app.testable().test(.GET, "/hello", afterResponse:  { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "Hello")
-        }
+        })
 
-        try app.testable().test(.GET, "/hello?failHard=t") { res in
+        try app.testable().test(.GET, "/hello?failHard=t", afterResponse:  { res in
             XCTAssertEqual(res.status, .badRequest)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "")
-        }
+        })
 
-        try app.testable().test(.GET, "/hello?echo=10") { res in
+        try app.testable().test(.GET, "/hello?echo=10", afterResponse:  { res in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "10")
-        }
+        })
     }
 }
 
