@@ -54,35 +54,35 @@ public struct QueryParam<T: Decodable>: QueryParamProtocol {
 ///
 /// e.x.
 ///
-///     <path>?param=hello
+///     {path}?param=hello
 public typealias StringQueryParam = QueryParam<String>
 
-/// A single value (must be integer)
+/// A single value (must be an integer).
 ///
 /// e.x.
 ///
-///     <path>?param=1
+///     {path}?param=1
 public typealias IntegerQueryParam = QueryParam<Int>
 
 /// A single value (must be number, not necessarily an integer)
 ///
 /// e.x.
 ///
-///     <path>?param=10.345
+///     {path}?param=10.345
 public typealias NumberQueryParam = QueryParam<Double>
 
 /// A comma separated list of values
 ///
 /// e.x. (`CSVQueryParam<String>`)
 ///
-///     <path>?param=hello,world
+///     {path}?param=hello,world
 public typealias CSVQueryParam<SwiftType: Decodable> = QueryParam<[SwiftType]>
 
 /// A value nested in an object.
 ///
 /// e.x.
 ///
-///     <path>?param[hello]=hi+there
+///     {path}?param[hello]=hi+there
 ///
 /// In this example, the path would be `["param", "hello"]`
 public struct NestedQueryParam<SwiftType: Decodable>: QueryParamProtocol {
