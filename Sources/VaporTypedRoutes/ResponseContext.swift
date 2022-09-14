@@ -22,7 +22,7 @@ public protocol AbstractResponseContextType {
 /// A type that represents a concrete response context.
 public protocol ResponseContextType: AbstractResponseContextType {
 	/// The associated response body type.
-    associatedtype ResponseBodyType: ResponseEncodable
+    associatedtype ResponseBodyType: AsyncResponseEncodable
 }
 
 extension ResponseContextType {
@@ -31,7 +31,7 @@ extension ResponseContextType {
 }
 
 /// A concrete response context with an associated body type.
-public struct ResponseContext<ResponseBodyType: ResponseEncodable>: ResponseContextType {
+public struct ResponseContext<ResponseBodyType: AsyncResponseEncodable>: ResponseContextType {
     public let configure: (inout Response) -> Void
 
 	/// Create a response context with a given configuration function.
@@ -43,7 +43,7 @@ public struct ResponseContext<ResponseBodyType: ResponseEncodable>: ResponseCont
 }
 
 /// A response context that always sends a given pre-determined response.
-public struct CannedResponse<ResponseBodyType: ResponseEncodable>: ResponseContextType {
+public struct CannedResponse<ResponseBodyType: AsyncResponseEncodable>: ResponseContextType {
     public let configure: (inout Response) -> Void
 	/// The response to send to the user.
     public let response: Response
