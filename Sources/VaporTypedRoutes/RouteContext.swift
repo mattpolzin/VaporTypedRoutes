@@ -16,6 +16,13 @@ extension EmptyResponseBody: ResponseEncodable {
     }
 }
 
+@available(macOS 12, *)
+extension EmptyRequestBody: AsyncResponseEncodable {
+	public func encodeResponse(for request: Request) async throws -> Response {
+		return try await "".encodeResponse(for: request)
+	}
+}
+
 public protocol AbstractRouteContext {
     static var requestBodyType: Any.Type { get }
 

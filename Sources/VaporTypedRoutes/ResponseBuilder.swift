@@ -22,13 +22,33 @@ public struct ResponseBuilder<Context: RouteContext> {
         return .init(request: request, modifiers: [context[keyPath: path].configure])
     }
 
+	/// Takes a KeyPath to a canned response and returns the canned response.
+	///
+	/// This is a function because subscripts can't be asynchronous or throw.
+	///
+	/// - Parameters:
+	///   - dynamicMember: A KeyPath from the route's `Context` to a  `CannedResponse` to return.
+	public func `subscript`<T>(dynamicMember path: KeyPath<Context, CannedResponse<T>>) async throws -> Response {
+		return try await self.subscript(dynamicMember: path).get()
+	}
+
 	/// Takes a KeyPath to a canned response and returns an `EventLoopFuture` with the canned response.
 	///
 	/// - Parameters:
 	///   - dynamicMember: A KeyPath from the route's `Context` to a  `CannedResponse` to return in the `EventLoopFuture`.
     public subscript<T>(dynamicMember path: KeyPath<Context, CannedResponse<T>>) -> EventLoopFuture<Response> {
-        return request.eventLoop.makeSucceededFuture(context[keyPath: path].response)
+		return self.subscript(dynamicMember: path)
     }
+
+	/// Takes a KeyPath to a canned response and returns the canned response.
+	///
+	/// This is a function so it can be shared between Futures and async/await.
+	///
+	/// - Parameters:
+	///   - dynamicMember: A KeyPath from the route's `Context` to a  `CannedResponse` to return.
+	private func `subscript`<T>(dynamicMember path: KeyPath<Context, CannedResponse<T>>) -> EventLoopFuture<Response> {
+		return request.eventLoop.makeSucceededFuture(context[keyPath: path].response)
+	}
 
 	/// Create a response builder with a given `TypedRequest`.
     public init(request: TypedRequest<Context>) {
@@ -55,6 +75,13 @@ public struct ResponseBuilder<Context: RouteContext> {
             }
         }
 
+		/// Encodes the response using a given instance of `ResponseBodyType`.
+		/// - Parameters:
+		///   - response: The instance of `ResponseBodyType` to use to generate the response.
+		public func encode(_ response: ResponseBodyType) async throws -> Response {
+			try await self.encode(response).get()
+		}
+
 		/// Create a `ResponseEncoder` using a given `TypedRequest` and set of modifiers.
 		/// - Parameters:
 		///   - request: The `TypedRequest` to use to generate the `Response`.
@@ -67,7 +94,13 @@ public struct ResponseBuilder<Context: RouteContext> {
 }
 
 public extension ResponseBuilder.ResponseEncoder where ResponseBodyType == EmptyResponseBody {
+	/// Encodes and returns an empty response in an `EventLoopFuture`.
     func encodeEmptyResponse() -> EventLoopFuture<Response> {
         return encode(EmptyResponseBody())
     }
+
+	/// Encodes and returns an empty response.
+	func encodeEmptyResponse() async throws -> Response {
+		try await self.encodeEmptyResponse().get()
+	}
 }
