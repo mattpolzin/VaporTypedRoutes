@@ -27,8 +27,8 @@ public struct ResponseBuilder<Context: RouteContext> {
 	/// This is a function because subscripts can't be asynchronous or throw.
 	///
 	/// - Parameters:
-	///   - dynamicMember: A KeyPath from the route's `Context` to a  `CannedResponse` to return.
-	public func `subscript`<T>(dynamicMember path: KeyPath<Context, CannedResponse<T>>) async throws -> Response {
+	///   - path: A KeyPath from the route's `Context` to a  `CannedResponse` to return.
+	public func get<T>(_ path: KeyPath<Context, CannedResponse<T>>) async throws -> Response {
 		return try await self.subscript(dynamicMember: path).get()
 	}
 

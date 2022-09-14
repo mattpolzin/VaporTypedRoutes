@@ -104,7 +104,7 @@ final class AsyncTestController {
 	static func showRoute(req: TypedRequest<TestShowRouteContext>) async throws -> Response {
 		if req.query.badQuery != nil {
 			// This is clunky but I don't see a better option because subscripts can't be async
-			return try await req.response.subscript(dynamicMember: \.badRequest)
+			return try await req.response.get(\.badRequest)
 		}
 		if let text = req.query.echo {
 			return try await req.response.success.encode("\(text)")
