@@ -17,7 +17,7 @@ extension EmptyResponseBody: ResponseEncodable {
 }
 
 @available(macOS 12, *)
-extension EmptyRequestBody: AsyncResponseEncodable {
+extension EmptyResponseBody: AsyncResponseEncodable {
 	public func encodeResponse(for request: Request) async throws -> Response {
 		return try await "".encodeResponse(for: request)
 	}
