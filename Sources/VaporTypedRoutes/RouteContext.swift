@@ -68,8 +68,10 @@ extension AbstractJSONRouteContext {
 ///         )
 ///     }
 public protocol RouteContext: AbstractRouteContext {
+	/// The type to expect for the request's body.
     associatedtype RequestBodyType: Decodable
 
+	/// A shared instance of the type.
     static var shared: Self { get }
 }
 
@@ -78,8 +80,17 @@ public protocol RouteContext: AbstractRouteContext {
 public protocol JSONRouteContext: RouteContext & AbstractJSONRouteContext {}
 
 extension RouteContext {
+	/// The type of the request body.
     public static var requestBodyType: Any.Type { return RequestBodyType.self }
 
+	/// An array containing the status code, MIME type, and body type of all the route context's `ResponseContext`s.
+	///
+	/// Any variable you declare that conforms to `AbstractResponseContextType` will be returned.
+	///
+	/// - Parameters:
+	///   - statusCode: An integer containing the HTTP status code of the response.
+	///   - contentType: The `HTTPMediaType` of the response (if any).'
+	///   - responseBodyType: The Swift type returned as the response body.
     public static var responseBodyTuples: [(statusCode: Int, contentType: HTTPMediaType?, responseBodyType: Any.Type)] {
         let context = Self.shared
 
@@ -105,6 +116,9 @@ extension RouteContext {
         }
     }
 
+	/// The abstract query parameters for the `RouteContext`.
+	///
+	/// Any variable you declare that conforms to `AbstractQueryParam` in the conforming object will be returned.
     public static var requestQueryParams: [AbstractQueryParam] {
         let context = Self.shared
 

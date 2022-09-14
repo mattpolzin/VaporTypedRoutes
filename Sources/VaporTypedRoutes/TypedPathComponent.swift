@@ -7,22 +7,44 @@
 
 import Vapor
 
+/// A strongly-typed path component.
 public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConvertible {
+	/// A normal, constant path component.
     case constant(String)
+	/// A dynamic parameter component with an associated Meta value.
+	///
+	/// The supplied identifier will be used to fetch the associated
+	/// value from `Parameters`.
+	///
+	/// Represented as `:` followed by the identifier. If provided as a StringLiteral, the Meta type will be initialized as a String with no description.
     case parameter(name: String, Meta)
+	/// A dynamic parameter component with a discarded value.
     case anything
+	/// A fallback component that will match one or more dynamic parameter components with discarded values.
+	///
+	/// Catch alls have the lowest precedence, and will only be matched if no more specific path components are found.
+	///	The matched subpath will be stored into Parameters.catchall.
+	///	Represented as `**`.
     case catchall
 
+	/// A struct with a Swift type and an associated description for a route parameter.
     public struct Meta {
+		/// The type for the route parameter.
         public let type: Any.Type
+		/// An optional description for the route parameter.
         public let description: String?
 
+		/// Create an instance with an associated type (defaults to `String`) and optional description.
+		/// - Parameters:
+		///   - type: The type for the route parameter.
+		///   - description: An optional description for the route parameter.
         public init(type: Any.Type = String.self, description: String? = nil) {
             self.type = type
             self.description = description
         }
     }
 
+	/// Create a typed path component from a string literal.
     public init(stringLiteral value: StringLiteralType) {
         switch Vapor.PathComponent(stringLiteral: value) {
         case .constant(let value):
@@ -36,6 +58,7 @@ public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConverti
         }
     }
 
+	/// The type associated with the route parameter, if any.
     public var parameterType: Any.Type? {
         guard case .parameter(_, let meta) = self else {
             return nil
@@ -43,6 +66,7 @@ public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConverti
         return meta.type
     }
 
+	/// The string equivalent of the component.
     public var description: String {
         switch self {
         case .anything:
@@ -56,6 +80,7 @@ public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConverti
         }
     }
 
+	/// The equivalent untyped `PathComponent`.
     public var vaporPathComponent: Vapor.PathComponent {
         switch self {
         case .anything:
@@ -71,10 +96,18 @@ public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConverti
 }
 
 extension TypedPathComponent {
+	/// Creates a TypedPathComponent with a given name, and a type of String.
+	/// - Parameters:
+	///   - name: The name of the route parameter.
     public static func parameter(_ name: String) -> Self {
         return .parameter(name: name, .init(type: String.self, description: nil))
     }
 
+
+	/// Creates a TypedPathComponent with a given name and type.
+	/// - Parameters:
+	///   - name: The name of the route parameter.
+	///   - type: The type to use for the route parameter.
     public static func parameter(_ name: String, type: Any.Type) -> Self {
         return .parameter(name: name, .init(type: type, description: nil))
     }
@@ -104,6 +137,7 @@ extension TypedPathComponent {
 }
 
 extension Vapor.PathComponent {
+	/// The equivalent `TypedPathComponent.
     var typedPathComponent: TypedPathComponent {
         switch self {
         case .anything:
@@ -146,6 +180,7 @@ extension String {
 }
 
 extension Array where Element == TypedPathComponent {
+	/// A path constructed from the array of `TypedPathComponent`s.
     public var string: String {
         self.map(\.description).joined(separator: "/")
     }
