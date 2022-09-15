@@ -105,8 +105,8 @@ extension RoutesBuilder {
             method: method,
             path: path.map(\.vaporPathComponent),
             responder: responder,
-            requestType: Request.self,
-            responseType: Response.self
+            requestType: Context.RequestBodyType.self,
+            responseType: Context.self
         )
 
         for pathComponent in path {
