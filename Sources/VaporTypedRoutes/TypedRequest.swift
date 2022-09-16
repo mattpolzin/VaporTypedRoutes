@@ -8,8 +8,10 @@
 import Vapor
 import NIO
 
+/// A strongly-typed Request.
 @dynamicMemberLookup
 public final class TypedRequest<Context: RouteContext> {
+    /// The underlying request.
     private let request: Request
 
     public private(set) lazy var query: Query = Query(request: self)

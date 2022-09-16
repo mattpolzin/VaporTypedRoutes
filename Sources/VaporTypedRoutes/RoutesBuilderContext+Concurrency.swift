@@ -1,12 +1,13 @@
 //
-//  RoutesBuilder+RouteContext.swift
-//  App
+//  RoutesBuilderContext+Concurrency.swift
+//  
 //
-//  Created by Mathew Polzin on 10/23/19.
+//  Created by Charlie Welsh on 9/14/22.
 //
 
 import Vapor
 
+@available(macOS 12, *)
 extension RoutesBuilder {
     /// A `GET` request handler using `TypedRequest`.
     /// - Parameters:
@@ -15,9 +16,9 @@ extension RoutesBuilder {
     @discardableResult
     public func get<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
         return self.on(.GET, path, use: closure)
     }
@@ -29,9 +30,9 @@ extension RoutesBuilder {
     @discardableResult
     public func post<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
         return self.on(.POST, path, use: closure)
     }
@@ -43,9 +44,9 @@ extension RoutesBuilder {
     @discardableResult
     public func patch<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
         return self.on(.PATCH, path, use: closure)
     }
@@ -57,9 +58,9 @@ extension RoutesBuilder {
     @discardableResult
     public func put<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
         return self.on(.PUT, path, use: closure)
     }
@@ -71,9 +72,9 @@ extension RoutesBuilder {
     @discardableResult
     public func delete<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
         return self.on(.DELETE, path, use: closure)
     }
@@ -89,25 +90,17 @@ extension RoutesBuilder {
         _ method: HTTPMethod,
         _ path: [TypedPathComponent],
         body: HTTPBodyStreamStrategy = .collect,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping (TypedRequest<Context>) async throws -> Response
     ) -> Route
-        where Context: RouteContext, Response: ResponseEncodable
+    where Context: RouteContext, Response: AsyncResponseEncodable
     {
-        let wrappingClosure = { (request: Vapor.Request) -> Response in
-            return try closure(.init(underlyingRequest: request))
-        }
 
-        let responder = BasicResponder { request in
+        let responder = AsyncBasicResponder { request in
             if case .collect(let max) = body, request.body.data == nil {
-                return request.body.collect(max: max?.value ?? request.application.routes.defaultMaxBodySize.value).flatMapThrowing { _ in
-                    return try wrappingClosure(request)
-                }.encodeResponse(for: request)
-            } else {
-                return try wrappingClosure(request)
-                    .encodeResponse(for: request)
+                _ = try await request.body.collect(max: max?.value ?? request.application.routes.defaultMaxBodySize.value).get()
             }
+            return try await closure(.init(underlyingRequest: request)).encodeResponse(for: request)
         }
-
         let route = Route(
             method: method,
             path: path.map(\.vaporPathComponent),
@@ -123,7 +116,6 @@ extension RoutesBuilder {
         }
 
         self.add(route)
-
         return route
     }
 }
