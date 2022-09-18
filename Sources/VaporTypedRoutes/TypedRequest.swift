@@ -15,6 +15,7 @@ public final class TypedRequest<Context: RouteContext> {
     private let request: Request
 
     public private(set) lazy var query: Query = Query(request: self)
+    public private(set) lazy var header: Headers = Headers(request: self)
     public private(set) lazy var response = ResponseBuilder<Context>(request: self)
 
     public subscript<T>(dynamicMember path: KeyPath<Request, T>) -> T {
