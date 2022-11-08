@@ -19,6 +19,14 @@ public protocol AbstractQueryParam {
     ///
     /// Useful for documentation generation.
     var description: String? { get }
+    /// Determines whether this parameter is mandatory.
+    ///
+    /// Default value is `false`.
+    var required: Bool { get }
+    /// Determines if the parameter is deprecated and SHOULD be transitioned out of usage.
+    ///
+    /// Default value is `false`
+    var deprecated: Bool { get }
 
     /// The associated Swift type for the query parameter.
     var swiftType: Any.Type { get }
@@ -47,17 +55,23 @@ public struct QueryParam<T: Decodable>: QueryParamProtocol {
     public let allowedValues: [String]?
     public let description: String?
     public let defaultValue: T?
+    public let required: Bool
+    public let deprecated: Bool
 
     /// Creates a new parameter instance with the constituent elements, allowing all values.
     /// - Parameters:
     ///   - name: The name of the query parameter (e.g, the part before the equals sign).
     ///   - description: An optional description of the query param (for documentation generation and the like).
     ///   - defaultValue: An optional default value to use when a request doesn't provide one.
-    public init(name: String, description: String? = nil, defaultValue: T? = nil) {
+    ///   - required: An optional flag indicating whether or not the query parameter is required.
+    ///   - deprecated: An optional flag indicating whether or not the query parameter is deprecated and should be transitioned out of usage.
+    public init(name: String, description: String? = nil, defaultValue: T? = nil, required: Bool = false, deprecated: Bool = false) {
         self.name = name
         self.allowedValues = nil
         self.defaultValue = defaultValue
         self.description = description
+        self.required = required
+        self.deprecated = deprecated
     }
 
     /// Creates a new parameter instance with the constituent elements, specifying a finite list of allowed values.
@@ -66,11 +80,15 @@ public struct QueryParam<T: Decodable>: QueryParamProtocol {
     ///   - description: An optional description of the query param (for documentation generation and the like).
     ///   - defaultValue: An optional default value to use when a request doesn't provide one.
     ///   - allowedValues: A finite list of allowed values.
-    public init<U: LosslessStringConvertible>(name: String, description: String? = nil, defaultValue: T? = nil, allowedValues: [U]) {
+    ///   - required: An optional flag indicating whether or not the query parameter is required.
+    ///   - deprecated: An optional flag indicating whether or not the query parameter is deprecated and should be transitioned out of usage.
+    public init<U: LosslessStringConvertible>(name: String, description: String? = nil, defaultValue: T? = nil, allowedValues: [U], required: Bool = false, deprecated: Bool = false) {
         self.name = name
         self.description = description
         self.defaultValue = defaultValue
         self.allowedValues = allowedValues.map(String.init(describing:))
+        self.required = required
+        self.deprecated = deprecated
     }
 }
 
@@ -115,6 +133,8 @@ public struct NestedQueryParam<SwiftType: Decodable>: QueryParamProtocol {
     public let allowedValues: [String]?
     public let description: String?
     public let defaultValue: SwiftType?
+    public let required: Bool
+    public let deprecated: Bool
 
     /// The name of the parameter.
     ///
@@ -127,8 +147,10 @@ public struct NestedQueryParam<SwiftType: Decodable>: QueryParamProtocol {
     ///   - description: An optional description of the query param (for documentation generation and the like).
     ///   - defaultValue: An optional default value to use when a request doesn't provide one.
     ///   - allowedValues: A finite list of allowed values.
-    public init(path: String..., description: String? = nil, defaultValue: SwiftType? = nil, allowedValues: [String]? = nil) {
-        self.init(path: path, description: description, defaultValue: defaultValue, allowedValues: allowedValues)
+    ///   - required: An optional flag indicating whether or not the query parameter is required.
+    ///   - deprecated: An optional flag indicating whether or not the query parameter is deprecated and should be transitioned out of usage.
+    public init(path: String..., description: String? = nil, defaultValue: SwiftType? = nil, allowedValues: [String]? = nil, required: Bool = false, deprecated: Bool = false) {
+        self.init(path: path, description: description, defaultValue: defaultValue, allowedValues: allowedValues, required: required, deprecated: deprecated)
     }
     /// Creates a new nested parameter instance with the constituent elements, specifying a finite list of allowed values.
     /// - Parameters:
@@ -136,10 +158,14 @@ public struct NestedQueryParam<SwiftType: Decodable>: QueryParamProtocol {
     ///   - description: An optional description of the query param (for documentation generation and the like).
     ///   - defaultValue: An optional default value to use when a request doesn't provide one.
     ///   - allowedValues: A finite list of allowed values.
-    public init(path: [String], description: String? = nil, defaultValue: SwiftType? = nil, allowedValues: [String]? = nil) {
+    ///   - required: An optional flag indicating whether or not the query parameter is required.
+    ///   - deprecated: An optional flag indicating whether or not the query parameter is deprecated and should be transitioned out of usage.
+    public init(path: [String], description: String? = nil, defaultValue: SwiftType? = nil, allowedValues: [String]? = nil, required: Bool = false, deprecated: Bool = false) {
         self.path = path
         self.allowedValues = allowedValues
         self.description = description
         self.defaultValue = defaultValue
+        self.required = required
+        self.deprecated = deprecated
     }
 }
