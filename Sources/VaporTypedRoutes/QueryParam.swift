@@ -19,11 +19,11 @@ public protocol AbstractQueryParam {
     ///
     /// Useful for documentation generation.
     var description: String? { get }
-    /// Determines whether this parameter is mandatory.
+    /// Determines whether the parameter is mandatory.
     ///
     /// Default value is `false`.
     var required: Bool { get }
-    /// Determines if the parameter is deprecated and SHOULD be transitioned out of usage.
+    /// Determines whether the parameter is deprecated and SHOULD be transitioned out of usage.
     ///
     /// Default value is `false`
     var deprecated: Bool { get }
