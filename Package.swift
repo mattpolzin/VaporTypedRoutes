@@ -13,7 +13,7 @@ let package = Package(
             targets: ["VaporTypedRoutes"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.50.0")),
+        .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.86.0")),
     ],
     targets: [
         .target(
