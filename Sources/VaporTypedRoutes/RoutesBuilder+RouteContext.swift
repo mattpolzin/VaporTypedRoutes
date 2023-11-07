@@ -118,12 +118,11 @@ extension RoutesBuilder {
 
         for pathComponent in path {
             if case let .parameter(name, meta) = pathComponent {
-                route.userInfo["typed_parameter:\(name)"] = meta
+                route.userInfo[AnySendableHashable("typed_parameter:\(name)")] = meta
             }
         }
 
         self.add(route)
-
         return route
     }
 }
