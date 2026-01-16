@@ -2,8 +2,6 @@
 //  RouteContext.swift
 //  App
 //
-//  Created by Mathew Polzin on 10/23/19.
-//
 
 import Vapor
 
@@ -74,7 +72,7 @@ extension AbstractJSONRouteContext {
 ///             )
 ///         )
 ///     }
-public protocol RouteContext: AbstractRouteContext {
+public protocol RouteContext: AbstractRouteContext, Sendable {
     /// The type to expect for the request's body.
     associatedtype RequestBodyType: Decodable
 
@@ -109,8 +107,7 @@ extension RouteContext {
 
         return responseContexts
             .map { responseContext in
-                var dummyResponse = Response()
-                responseContext.configure(&dummyResponse)
+                let dummyResponse = responseContext.configure(Response())
 
                 let statusCode = Int(dummyResponse.status.code)
                 let contentType = dummyResponse.headers.contentType

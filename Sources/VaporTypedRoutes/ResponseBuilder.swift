@@ -12,7 +12,7 @@ public struct ResponseBuilder<Context: RouteContext> {
     /// The context for the route.
     public let context: Context = .shared
     /// The associated request for the route.
-    private unowned var request: TypedRequest<Context>
+    private unowned let request: TypedRequest<Context>
 
     /// Takes a KeyPath to a response context and returns a `ResponseEncoder` using the given `ResponseContext`.
     ///
@@ -56,11 +56,11 @@ public struct ResponseBuilder<Context: RouteContext> {
     }
 
     /// A response encoder for a given body type.
-    public struct ResponseEncoder<ResponseBodyType: ResponseEncodable> {
+    public struct ResponseEncoder<ResponseBodyType: ResponseEncodable>: Sendable {
         /// The associated request.
         private let request: TypedRequest<Context>
         /// A set of functions used to modify the request.
-        private let modifiers: [(inout Response) -> Void]
+        private let modifiers: [@Sendable (Response) -> Response]
 
         /// Returns an `EventLoopFuture` containing the encoded response, using a given instance of `ResponseBodyType`.
         /// - Parameters:
@@ -70,8 +70,11 @@ public struct ResponseBuilder<Context: RouteContext> {
                 .encodeResponse(for: request.underlyingRequest)
 
             return encodedResponseFuture.map { encodedResponse in
-                self.modifiers
-                    .reduce(into: encodedResponse) { resp, mod in mod(&resp) }
+                var resp = encodedResponse
+                for mod in self.modifiers {
+                  resp = mod(resp)
+                }
+                return resp
             }
         }
 
@@ -86,7 +89,7 @@ public struct ResponseBuilder<Context: RouteContext> {
         /// - Parameters:
         ///   - request: The `TypedRequest` to use to generate the `Response`.
         ///   - modifiers: The functions to use to modify thr request.
-        init(request: TypedRequest<Context>, modifiers: [(inout Response) -> Void]) {
+        init(request: TypedRequest<Context>, modifiers: [@Sendable (Response) -> Response]) {
             self.request = request
             self.modifiers = modifiers
         }

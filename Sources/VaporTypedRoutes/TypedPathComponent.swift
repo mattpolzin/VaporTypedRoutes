@@ -28,7 +28,7 @@ public enum TypedPathComponent: ExpressibleByStringLiteral, CustomStringConverti
     case catchall
 
     /// A struct with a Swift type and an associated description for a route parameter.
-    public struct Meta {
+    public struct Meta: Sendable {
         /// The type for the route parameter.
         public let type: Any.Type
         /// An optional description for the route parameter.

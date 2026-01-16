@@ -15,8 +15,8 @@ final class JSONRouteContextTests: XCTestCase {
     }
 }
 
-fileprivate struct TestContext: JSONRouteContext {
+fileprivate struct TestContext: JSONRouteContext, Sendable {
     typealias RequestBodyType = EmptyRequestBody
 
-    static var shared: TestContext = .init()
+    static let shared: TestContext = .init()
 }

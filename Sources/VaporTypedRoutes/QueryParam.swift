@@ -8,7 +8,7 @@
 import Vapor
 
 /// A type that represents an abstract query parameter in a request.
-public protocol AbstractQueryParam {
+public protocol AbstractQueryParam: Sendable {
     /// The name of the parameter.
     var name: String { get }
     /// A list of allowed values, if any.
@@ -48,7 +48,7 @@ extension QueryParamProtocol {
 }
 
 /// A concrete query parameter with an associated Swift type.
-public struct QueryParam<T: Decodable>: QueryParamProtocol {
+public struct QueryParam<T: Decodable & Sendable>: QueryParamProtocol {
     public typealias SwiftType = T
 
     public let name: String
@@ -118,7 +118,7 @@ public typealias NumberQueryParam = QueryParam<Double>
 /// e.x. (`CSVQueryParam<String>`)
 ///
 ///     {path}?param=hello,world
-public typealias CSVQueryParam<SwiftType: Decodable> = QueryParam<[SwiftType]>
+public typealias CSVQueryParam<SwiftType: Decodable & Sendable> = QueryParam<[SwiftType]>
 
 /// A query parameter where the value is nested in an object.
 ///
@@ -127,7 +127,7 @@ public typealias CSVQueryParam<SwiftType: Decodable> = QueryParam<[SwiftType]>
 ///     {path}?param[hello]=hi+there
 ///
 /// In this example, the path would be `["param", "hello"]`
-public struct NestedQueryParam<SwiftType: Decodable>: QueryParamProtocol {
+public struct NestedQueryParam<SwiftType: Decodable & Sendable>: QueryParamProtocol {
     /// The path components of the query parameter.
     public let path: [String]
     public let allowedValues: [String]?

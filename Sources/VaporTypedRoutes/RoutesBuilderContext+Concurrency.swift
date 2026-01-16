@@ -1,9 +1,6 @@
 //
 //  RoutesBuilderContext+Concurrency.swift
 //  
-//
-//  Created by Charlie Welsh on 9/14/22.
-//
 
 import Vapor
 
@@ -16,7 +13,7 @@ extension RoutesBuilder {
     @discardableResult
     public func get<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {
@@ -30,7 +27,7 @@ extension RoutesBuilder {
     @discardableResult
     public func post<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {
@@ -44,7 +41,7 @@ extension RoutesBuilder {
     @discardableResult
     public func patch<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {
@@ -58,7 +55,7 @@ extension RoutesBuilder {
     @discardableResult
     public func put<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {
@@ -72,7 +69,7 @@ extension RoutesBuilder {
     @discardableResult
     public func delete<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {
@@ -90,7 +87,7 @@ extension RoutesBuilder {
         _ method: HTTPMethod,
         _ path: [TypedPathComponent],
         body: HTTPBodyStreamStrategy = .collect,
-        use closure: @escaping (TypedRequest<Context>) async throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) async throws -> Response
     ) -> Route
     where Context: RouteContext, Response: AsyncResponseEncodable
     {

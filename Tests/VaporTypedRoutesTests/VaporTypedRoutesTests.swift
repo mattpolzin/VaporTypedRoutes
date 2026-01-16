@@ -4,19 +4,18 @@ import XCTVapor
 import Vapor
 
 final class VaporTypedRoutesTests: XCTestCase {
-    func test_get() throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
+    func test_get() async throws {
+        let app = try await Application.make(.testing)
 
         app.routes.get("hello", use: TestController.showRoute)
 
-        try app.testable().test(.GET, "/hello", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello") { res async in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "Hello")
-        })
+        }
 
-        try app.testable().test(.GET, "/hello?failHard=t", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello?failHard=t") { res async in
             print(res)
             let resBodyData = Data(buffer: res.body)
             print(String(data: resBodyData, encoding: .utf8)!)
@@ -24,46 +23,49 @@ final class VaporTypedRoutesTests: XCTestCase {
             XCTAssertEqual(res.status, .badRequest)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "")
-        })
+        }
 
-        try app.testable().test(.GET, "/hello?echo=10", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello?echo=10") { res async in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "10")
-        })
+        }
+
+        try await app.asyncShutdown()
     }
 
     @available(macOS 12, *)
-    func test_async_get() throws {
-        let app = Application(.testing)
-        defer { app.shutdown() }
+    func test_async_get() async throws {
+        let app = try await Application.make(.testing)
 
         app.routes.get("hello", use: AsyncTestController.showRoute)
 
-        try app.testable().test(.GET, "/hello", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello") { res async in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "Hello")
-        })
+        }
 
-        try app.testable().test(.GET, "/hello?failHard=t", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello?failHard=t") { res async in
             XCTAssertEqual(res.status, .badRequest)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "")
-        })
+        }
 
-        try app.testable().test(.GET, "/hello?echo=10", afterResponse:  { res in
+        try await app.testable().test(.GET, "/hello?echo=10") { res async in
             XCTAssertEqual(res.status, .ok)
             XCTAssertEqual(res.headers.contentType, .plainText)
             XCTAssertEqual(res.body.string, "10")
-        })
+        }
+
+        try await app.asyncShutdown()
     }
 }
 
 struct TestShowRouteContext: RouteContext {
     typealias RequestBodyType = EmptyRequestBody
 
-    static var defaultContentType: HTTPMediaType? = .plainText
+    static let defaultContentType: HTTPMediaType? = .plainText
 
     static let shared = Self()
 
@@ -71,8 +73,10 @@ struct TestShowRouteContext: RouteContext {
     let echo: IntegerQueryParam = .init(name: "echo")
 
     let success: ResponseContext<String> = .init { response in
+        var resp = response
         response.headers = Self.plainTextHeader
         response.status = .ok
+        return response
     }
 
     let badRequest: CannedResponse<String> = .init(
