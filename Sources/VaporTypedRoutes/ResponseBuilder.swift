@@ -60,7 +60,7 @@ public struct ResponseBuilder<Context: RouteContext> {
         /// The associated request.
         private let request: TypedRequest<Context>
         /// A set of functions used to modify the request.
-        private let modifiers: [@Sendable (Response) -> Response]
+        private let modifiers: [@Sendable (inout Response) -> Void]
 
         /// Returns an `EventLoopFuture` containing the encoded response, using a given instance of `ResponseBodyType`.
         /// - Parameters:
@@ -70,11 +70,9 @@ public struct ResponseBuilder<Context: RouteContext> {
                 .encodeResponse(for: request.underlyingRequest)
 
             return encodedResponseFuture.map { encodedResponse in
-                var resp = encodedResponse
-                for mod in self.modifiers {
-                  resp = mod(resp)
+                self.modifiers.reduce(into: encodedResponse) { resp, mod in
+                    mod(&resp)
                 }
-                return resp
             }
         }
 
@@ -89,7 +87,7 @@ public struct ResponseBuilder<Context: RouteContext> {
         /// - Parameters:
         ///   - request: The `TypedRequest` to use to generate the `Response`.
         ///   - modifiers: The functions to use to modify thr request.
-        init(request: TypedRequest<Context>, modifiers: [@Sendable (Response) -> Response]) {
+        init(request: TypedRequest<Context>, modifiers: [@Sendable (inout Response) -> Void]) {
             self.request = request
             self.modifiers = modifiers
         }

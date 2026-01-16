@@ -73,10 +73,8 @@ struct TestShowRouteContext: RouteContext {
     let echo: IntegerQueryParam = .init(name: "echo")
 
     let success: ResponseContext<String> = .init { response in
-        var resp = response
         response.headers = Self.plainTextHeader
         response.status = .ok
-        return response
     }
 
     let badRequest: CannedResponse<String> = .init(

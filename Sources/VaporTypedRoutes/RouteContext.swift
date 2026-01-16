@@ -107,7 +107,8 @@ extension RouteContext {
 
         return responseContexts
             .map { responseContext in
-                let dummyResponse = responseContext.configure(Response())
+                var dummyResponse = Response()
+                responseContext.configure(&dummyResponse)
 
                 let statusCode = Int(dummyResponse.status.code)
                 let contentType = dummyResponse.headers.contentType

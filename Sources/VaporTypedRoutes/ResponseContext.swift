@@ -14,7 +14,7 @@ public protocol AbstractResponseContextType: Sendable {
     /// A function used to configure the response.
     /// - Parameters:
     ///   - response: The response to configure.
-    var configure: @Sendable (Response) -> Response { get }
+    var configure: @Sendable (inout Response) -> Void { get }
     /// The type of the response's body.
     var responseBodyType: Any.Type { get }
 }
@@ -32,17 +32,17 @@ extension ResponseContextType {
 
 /// A concrete response context with an associated body type.
 public struct ResponseContext<ResponseBodyType: AsyncResponseEncodable>: ResponseContextType {
-    public let configure: @Sendable (Response) -> Response
+    public let configure: @Sendable (inout Response) -> Void
 
     /// Create a response context with a given configuration function.
-    public init(_ configure: @escaping @Sendable (Response) -> Response) {
+    public init(_ configure: @escaping @Sendable (inout Response) -> Void) {
         self.configure = configure
     }
 }
 
 /// A response context that always sends a given pre-determined response.
 public struct CannedResponse<ResponseBodyType: AsyncResponseEncodable>: ResponseContextType {
-    public let configure: @Sendable (Response) -> Response
+    public let configure: @Sendable (inout Response) -> Void
     /// The response to send to the user.
     public let response: Response
 
@@ -51,6 +51,6 @@ public struct CannedResponse<ResponseBodyType: AsyncResponseEncodable>: Response
     ///   - response: The response to send to the user.
     public init(response cannedResponse: Response) {
         self.response = cannedResponse
-        self.configure = { _ in cannedResponse }
+        self.configure = { resp in resp = cannedResponse }
     }
 }
