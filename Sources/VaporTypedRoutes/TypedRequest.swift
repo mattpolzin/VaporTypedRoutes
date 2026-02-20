@@ -10,12 +10,12 @@ import NIO
 
 /// A strongly-typed Request.
 @dynamicMemberLookup
-public final class TypedRequest<Context: RouteContext> {
+public final class TypedRequest<Context: RouteContext>: Sendable {
     /// The underlying request.
     private let request: Request
 
-    public private(set) lazy var query: Query = Query(request: self)
-    public private(set) lazy var response = ResponseBuilder<Context>(request: self)
+    public var query: Query { .init(request: self) }
+    public var response: ResponseBuilder<Context> { .init(request: self) }
 
     public subscript<T>(dynamicMember path: KeyPath<Request, T>) -> T {
         return request[keyPath: path]

@@ -15,7 +15,7 @@ extension RoutesBuilder {
     @discardableResult
     public func get<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
@@ -29,7 +29,7 @@ extension RoutesBuilder {
     @discardableResult
     public func post<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
@@ -43,7 +43,7 @@ extension RoutesBuilder {
     @discardableResult
     public func patch<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
@@ -57,7 +57,7 @@ extension RoutesBuilder {
     @discardableResult
     public func put<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
@@ -71,7 +71,7 @@ extension RoutesBuilder {
     @discardableResult
     public func delete<Context, Response>(
         _ path: TypedPathComponent...,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
@@ -89,11 +89,11 @@ extension RoutesBuilder {
         _ method: HTTPMethod,
         _ path: [TypedPathComponent],
         body: HTTPBodyStreamStrategy = .collect,
-        use closure: @escaping (TypedRequest<Context>) throws -> Response
+        use closure: @escaping @Sendable (TypedRequest<Context>) throws -> Response
     ) -> Route
         where Context: RouteContext, Response: ResponseEncodable
     {
-        let wrappingClosure = { (request: Vapor.Request) -> Response in
+        let wrappingClosure = { @Sendable (request: Vapor.Request) -> Response in
             return try closure(.init(underlyingRequest: request))
         }
 

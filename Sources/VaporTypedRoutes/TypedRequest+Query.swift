@@ -8,9 +8,9 @@
 extension TypedRequest {
     /// An object containing the various 
     @dynamicMemberLookup
-    public final class Query {
+    public final class Query: Sendable {
         /// The parent request.
-        private unowned var typedRequest: TypedRequest
+        private unowned let typedRequest: TypedRequest
         /// The context for the request.
         private let context: Context = .shared
 
